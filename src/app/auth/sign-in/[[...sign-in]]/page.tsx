@@ -1,7 +1,9 @@
 import React from 'react'
 import { SignIn } from '@clerk/nextjs'
 
-const SignInPage = () => {
+type Props = {}
+
+const SignInPage = (props: Props) => {
     return <SignIn />
 }
 
