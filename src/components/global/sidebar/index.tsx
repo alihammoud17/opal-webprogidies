@@ -9,12 +9,17 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 import Modal from '../modal'
-import { PlusCircle } from 'lucide-react'
+import { Menu, PlusCircle } from 'lucide-react'
 import Search from '../search'
 import { MENU_ITEMS } from '@/constants'
 import SidebarItems from './sidebar-items'
 import { getNotifications } from '@/actions/user'
 import WorkspacePlaceholder from './workspace-placeholder'
+import GlobalCard from '../global-card'
+import Loader from '../loader'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import InfoBar from '../info-bar'
 
 type Props = {
     activeWorkspaceId: string
@@ -22,7 +27,7 @@ type Props = {
 
 const Sidebar = ({ activeWorkspaceId }: Props) => {
 
-
+    //WIP: Upgrade button
     const router = useRouter();
 
     const pathName = usePathname();
@@ -41,11 +46,11 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
         router.push(`/dashboard/${value}`);
     }
 
-    const currentWorkspace = workspace.workspace.find((workspace) => workspace.id === activeWorkspaceId);
+    const currentWorkspace = workspace?.workspace?.find((workspace) => workspace.id === activeWorkspaceId);
 
     console.log("pathName", pathName);
 
-    return (
+    const SidebarSection = (
         <div className='bg-[#111111] flex-none relative p-4 h-full w-[250px] flex flex-col gap-4 items-center overflow-hidden'>
             <div className='bg-[#111111] p-4 gap-2 justify-center items-center mb-4 absolute top-0 left-0 right-0 flex'>
                 <Image src='/opal-logo.svg' alt='logo' width={40} height={40} />
@@ -60,7 +65,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                         <SelectLabel>Workspaces</SelectLabel>
                         <Separator />
                         {
-                            workspace.workspace.map((workspace) => (
+                            workspace?.workspace?.map((workspace) => (
                                 <SelectItem
                                     key={workspace.id}
                                     value={workspace.id}
@@ -70,7 +75,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                             ))
                         }
                         {
-                            workspace.members.length > 0
+                            workspace?.members?.length > 0
                             && workspace.members.map((member) => (member.Workspace &&
                                 <SelectItem
                                     key={member.Workspace.id}
@@ -84,7 +89,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 </SelectContent>
             </Select>
             {/* Invite to workspace */}
-            {currentWorkspace?.type === 'PUBLIC' && workspace.subscription?.plan === 'PRO' && (
+            {currentWorkspace?.type === 'PUBLIC' && workspace?.subscription?.plan === 'PRO' && (
                 <Modal
                     title='Invite To Workspace'
                     description='Invite members to your workspace'
@@ -121,17 +126,17 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             <p className='w-full text-[#9d9d9d] font-bold mt-4'>Workspaces</p>
 
             {
-                workspace.workspace.length === 1 && workspace.members.length === 0 && (
+                workspace?.workspace?.length === 1 && workspace.members.length === 0 && (
                     <div className='w-full mt-[-10px]'>
                         <p className="text-[#9d9d9d] font-medium text-sm opacity-40">
-                            {workspace.subscription?.plan === 'FREE' ? 'Upgrade to Pro to create more workspaces' : 'Create a workspace to get started'}
+                            {workspace?.subscription?.plan === 'FREE' ? 'Upgrade to Pro to create more workspaces' : 'Create a workspace to get started'}
                         </p>
                     </div>
                 )
             }
             <nav className='w-full'>
                 <ul className='h-[150px] overflow-auto overflow-x-hidden fade-layer'>
-                    {workspace.workspace.length > 0 && workspace.workspace.map((workspace) => workspace.type !== 'PERSONAL' && (
+                    {workspace?.workspace?.length > 0 && workspace.workspace?.map((workspace) => workspace.type !== 'PERSONAL' && (
                         <SidebarItems
                             key={workspace.id}
                             title={workspace.name}
@@ -141,7 +146,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                         />
                     ))}
                     {
-                        workspace.members.length > 0 && workspace.members.map((member) => (
+                        workspace?.members?.length > 0 && workspace.members?.map((member) => (
                             member.Workspace && (
                                 <SidebarItems
                                     key={member.Workspace.id}
@@ -155,9 +160,52 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                 </ul>
             </nav>
             <Separator className='w-4/5' />
-            {workspace.subscription?.plan === 'FREE' && (
-                <></>
+            {workspace?.subscription?.plan === 'FREE' && (
+                <GlobalCard
+                    title='Upgrade to Pro'
+                    description='Unlock AI features like transcription, AI summary, and more'
+                    footer={
+                        <Button
+                            className='w-full text-sm mt-2'
+                            onClick={() => router.push('/dashboard/upgrade')}
+                        >
+                            <Loader>Upgrade</Loader>
+                        </Button>
+                    }
+                />
             )}
+
+        </div>
+    );
+
+    return (
+        <div className='full'>
+            {/* INFOBAR */}
+            <InfoBar />
+            {/* SHEET (MOBILE/DESKTOP) */}
+            <div className='md:hidden fixed my-4'>
+                <Sheet>
+                    <SheetTrigger asChild
+                        className='ml-2'
+                    >
+                        <Button
+                            variant='ghost'
+                            className='mt-[2px]'
+                        >
+                            <Menu />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent
+                        side='left'
+                        className='p-0 w-fit h-full'
+                    >
+                        {SidebarSection}
+                    </SheetContent>
+                </Sheet>
+            </div>
+            <div className="md:block hidden h-full">
+                {SidebarSection}
+            </div>
 
         </div>
     )
