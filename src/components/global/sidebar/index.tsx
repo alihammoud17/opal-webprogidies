@@ -169,7 +169,10 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
                             className='w-full text-sm mt-2'
                             onClick={() => router.push('/dashboard/upgrade')}
                         >
-                            <Loader>Upgrade</Loader>
+                            <Loader
+                                color='#000'
+                                state={false}
+                            >Upgrade</Loader>
                         </Button>
                     }
                 />
