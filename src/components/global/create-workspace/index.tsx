@@ -27,25 +27,25 @@ const CreateWorkspace = (props: Props) => {
     }
 
     // TODO: Uncomment later 
-    // if (plan?.subscription?.plan === 'PRO')
+    if (plan?.subscription?.plan === 'PRO')
 
-    return (
-        <Modal
-            title='Create a Workspace'
-            description='Create a new workspace to collaborate with your team. Enter the workspace details below to get started.'
-            trigger={
-                <Button className='bg-[#1d1d1d] text-[#707070] flex items-center gap-2 py-6 px-4 rounded-2xl'>
-                    <FolderPlusDuotine />{' '}
-                    Create a workspace
-                </Button>
-            }
-        >
-            <WorkspaceForm />
-        </Modal>
-    );
+        return (
+            <Modal
+                title='Create a Workspace'
+                description='Create a new workspace to collaborate with your team. Enter the workspace details below to get started.'
+                trigger={
+                    <Button className='bg-[#1d1d1d] text-[#707070] flex items-center gap-2 py-6 px-4 rounded-2xl'>
+                        <FolderPlusDuotine />{' '}
+                        Create a workspace
+                    </Button>
+                }
+            >
+                <WorkspaceForm />
+            </Modal>
+        );
 
-    // if (plan?.subscription?.plan === 'FREE')
-    //     return <></>;
+    if (plan?.subscription?.plan === 'FREE')
+        return <></>;
 }
 
 export default CreateWorkspace;
