@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MutationFunction, MutationKey, useMutation, useMutationState, useQueryClient } from "@tanstack/react-query";
 import { toast } from 'sonner';

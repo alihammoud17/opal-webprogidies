@@ -63,6 +63,7 @@ export const getWorkspaceFolders = async (workSpaceId: string) => {
         });
 
         if (folders && folders.length > 0) {
+            console.log("Folders", folders);
             return { status: 200, data: folders }
         }
 
@@ -277,11 +278,41 @@ export const renameFolder = async (folderId: string, name: string) => {
         });
 
         if (folder) {
+            console.log("Folder is renamed", folder);
             return { status: 200, data: 'Folder renamed' };
         }
 
+        console.log("Folder is renamed", folder);
+
         return { status: 404, data: 'Folder not found' };
-    } catch {
+    } catch (error) {
+        console.log("Folder is not renamed", error);
+
         return { status: 400, data: 'Oops! Error renaming folder' };
+    }
+}
+
+export const createFolder = async (workspaceId: string) => {
+    try {
+        const folder = await client.workSpace.update({
+            where: {
+                id: workspaceId
+            },
+            data: {
+                folders: {
+                    create: {
+                        name: 'Untitled'
+                    }
+                }
+            }
+        });
+
+        if (folder) {
+            return { status: 200, data: 'Folder created' };
+        }
+
+        return { status: 400, data: 'Could not create folder' };
+    } catch {
+        return { status: 500, data: 'Error creating folder' };
     }
 }

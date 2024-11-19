@@ -1,107 +1,95 @@
-'use client';
-import { cn } from '@/lib/utils';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useState } from 'react'
-import Loader from '../loader';
-import FolderDuotone from '@/components/icons/folder-duotone';
-import { useMutationData } from '@/hooks/useMutationData';
-import { renameFolder } from '@/actions/workspace';
-import { Input } from '@/components/ui/input';
+'use client'
+import { cn } from '@/lib/utils'
+import { usePathname, useRouter } from 'next/navigation'
+import React, { useRef, useState } from 'react'
+import Loader from '../loader'
+import FolderDuotone from '@/components/icons/folder-duotone'
+import { useMutationData, useMutationDataState } from '@/hooks/useMutationData'
+import { renameFolder } from '@/actions/workspace'
+import { Input } from '@/components/ui/input'
 
 type Props = {
-    name: string,
-    id: string,
-    optimistic?: boolean,
+    name: string
+    id: string
+    optimistic?: boolean
     count?: number
 }
 
-const Folder = ({
-    name,
-    id,
-    optimistic,
-    count
-}: Props) => {
+const Folder = ({ id, name, optimistic, count }: Props) => {
+    const inputRef = useRef<HTMLInputElement | null>(null)
+    const folderCardRef = useRef<HTMLDivElement | null>(null)
+    const pathName = usePathname()
+    const router = useRouter()
+    const [onRename, setOnRename] = useState(false)
 
-    const inputRef = React.useRef<HTMLInputElement | null>(null);
-    const folderCardRef = React.useRef<HTMLDivElement | null>(null);
-    // rename state 
-    const [onRename, setOnRename] = useState(false);
-    // handle rename
-    const Rename = () => {
-        setOnRename(true);
-    }
-    // handle rename cancel
-    const Renamed = () => {
-        setOnRename(false);
-    }
+    const Rename = () => setOnRename(true)
+    const Renamed = () => setOnRename(false)
 
-    // link to take element
-    const pathName = usePathname();
-    const router = useRouter();
-    // send user programatically to a page. (rather than using a link)
 
-    // wip: Add loading state
-
-    // optimistic variable
+    //optimistic
     const { mutate, isPending } = useMutationData(
-        ['rename-folder'],
+        ['rename-folders'],
         (data: { name: string }) => renameFolder(id, data.name),
         'workspace-folders',
         Renamed
-    );
+    )
 
-    const updateFolderName = (e: React.FocusEvent<HTMLInputElement>) => {
-        if (inputRef.current && folderCardRef.current) {
-            if (!inputRef.current.contains(e?.target as Node | null) &&
-                !folderCardRef.current.contains(e?.target as Node | null)) {
-                if (inputRef.current.value) {
-                    mutate({ name: inputRef.current.value });
-                }
-                else {
-                    Renamed();
-                }
-            }
-        }
-    }
+    const { latestVariables } = useMutationDataState(['rename-folders'])
 
-    // handle folder click
     const handleFolderClick = () => {
-        router.push(`${pathName}/folder/${id}`);
+        if (onRename) return
+        router.push(`${pathName}/folder/${id}`)
     }
 
     const handleNameDoubleClick = (e: React.MouseEvent<HTMLParagraphElement>) => {
-        e.stopPropagation();
-        console.log('double click');
-        Rename();
+        e.stopPropagation()
+        Rename()
+        //Rename functionality
+    }
+
+    const updateFolderName = (e: React.FocusEvent<HTMLInputElement>) => {
+        if (inputRef.current) {
+            if (inputRef.current.value) {
+                mutate({ name: inputRef.current.value, id })
+            } else Renamed()
+        }
     }
 
     return (
         <div
             onClick={handleFolderClick}
             ref={folderCardRef}
-            className={cn(optimistic && 'opacity-60', 'flex hover:bg-neutral-800 cursor-pointer transition duration-150 items-center gap-2 justify-between min-w-[250px] py-4 px-4 rounded-lg border-[1px]')}
+            className={cn(
+                optimistic && 'opacity-60',
+                'flex hover:bg-neutral-800 cursor-pointer transition duration-150 items-center gap-2 justify-between min-w-[250px] py-4 px-4 rounded-lg  border-[1px]'
+            )}
         >
-            <Loader state={false}>
-                <div className='flex flex-col gap-[1px]'>
+            <Loader state={isPending}>
+                <div className="flex flex-col gap-[1px]">
                     {onRename ? (
                         <Input
-                            onBlur={updateFolderName}
-                            ref={inputRef}
-                            type='text'
-                            placeholder={name}
+                            onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                                updateFolderName(e)
+                            }}
                             autoFocus
-                            className='bg-transparent border-none text-base w-full outline-none p-0 text-neutral-300'
+                            placeholder={name}
+                            className="border-none text-base w-full outline-none text-neutral-300 bg-transparent p-0"
+                            ref={inputRef}
                         />
-                    ) :
+                    ) : (
                         <p
                             onClick={(e) => e.stopPropagation()}
-                            className='text-neutral-300'
+                            className="text-neutral-300"
                             onDoubleClick={handleNameDoubleClick}
                         >
-                            {name}
+                            {latestVariables &&
+                                latestVariables.status === 'pending' &&
+                                latestVariables.variables.id === id
+                                ? latestVariables.variables.name
+                                : name}
                         </p>
-                    }
-                    <span className='text-sm text-neutral-500'>{count || 0} videos</span>
+                    )}
+                    <span className="text-sm text-neutral-500">{count || 0} videos</span>
                 </div>
             </Loader>
             <FolderDuotone />
@@ -109,4 +97,4 @@ const Folder = ({
     )
 }
 
-export default Folder;
+export default Folder
