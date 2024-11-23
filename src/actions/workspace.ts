@@ -342,3 +342,29 @@ export const getFolderInfo = async (folderId: string) => {
         return { status: 500, data: null };
     }
 }
+
+export const moveVideoLocation = async (
+    videoId: string,
+    workSpaceId: string,
+    folderId: string
+) => {
+    try {
+        const location = await client.video.update({
+            where: {
+                id: videoId
+            },
+            data: {
+                folderId: folderId || null,
+                workSpaceId
+            }
+        });
+
+        if (location) {
+            return { status: 200, data: 'Video moved successfully.' };
+        }
+
+        return { status: 404, data: 'Video not found' };
+    } catch {
+        return { status: 500, data: 'Error moving video' };
+    }
+}

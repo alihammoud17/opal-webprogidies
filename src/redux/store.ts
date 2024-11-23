@@ -5,8 +5,8 @@ import ForlderReducer from './slices/folders';
 import WorkSpaceReducer from './slices/workspaces';
 
 const rootReducer = combineReducers({
-    ForlderReducer,
-    WorkSpaceReducer
+    folders: ForlderReducer,
+    workspaces: WorkSpaceReducer
 });
 
 export const store = configureStore({
