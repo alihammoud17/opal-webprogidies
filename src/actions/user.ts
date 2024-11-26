@@ -33,7 +33,6 @@ export const onAuthenticateUser = async () => {
             }
         }
 
-        console.log("user email", user.emailAddresses[0].emailAddress);
 
         const newUser = await client.user.create({
             data: {
@@ -77,7 +76,6 @@ export const onAuthenticateUser = async () => {
 
         return { status: 400 }
     } catch (error) {
-        console.log("error", error)
         return { status: 500 }
     }
 }

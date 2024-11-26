@@ -63,7 +63,6 @@ export const getWorkspaceFolders = async (workSpaceId: string) => {
         });
 
         if (folders && folders.length > 0) {
-            console.log("Folders", folders);
             return { status: 200, data: folders }
         }
 
@@ -278,15 +277,12 @@ export const renameFolder = async (folderId: string, name: string) => {
         });
 
         if (folder) {
-            console.log("Folder is renamed", folder);
             return { status: 200, data: 'Folder renamed' };
         }
 
-        console.log("Folder is renamed", folder);
 
         return { status: 404, data: 'Folder not found' };
     } catch (error) {
-        console.log("Folder is not renamed", error);
 
         return { status: 400, data: 'Oops! Error renaming folder' };
     }

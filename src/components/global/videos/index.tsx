@@ -15,26 +15,12 @@ type Props = {
 
 const Videos = ({ folderId, videosKey, workspaceId }: Props) => {
 
-    const video = {
-        User: {
-            firstname: 'John',
-            lastname: 'Doe',
-            image: 'https://picsum.photos/id/237/200/300'
-        },
-        id: 'video1',
-        processing: false,
-        Folder: {
-            id: 'folder1',
-            name: 'My Videos'
-        },
-        createdAt: new Date('2023-01-01T10:00:00Z'),
-        title: 'My First Video',
-        source: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-    }
-
-    const { data: videoData } = useQueryData([videosKey], () =>
-        getAllUserVideos(folderId)
+    const { data: videoData } = useQueryData(
+        [videosKey],
+        () => getAllUserVideos(folderId)
     )
+
+    console.log("videoData: ", videoData);
 
     const { status: videosStatus, data: videos } = videoData as VideosProps
 
@@ -53,22 +39,28 @@ const Videos = ({ folderId, videosKey, workspaceId }: Props) => {
                         : 'grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
                 )}
             >
-                {/* {videosStatus === 200 ? (
-                    videos.map((video) => (
-                        <VideoCard
-                            key={video.id}
-                            workspaceId={workspaceId}
-                            {...video}
-                        />
-                    ))
+                {videosStatus === 200 ? (
+                    videos.map((video) => {
+
+                        const { User, Folder, processing, id, createdAt, title, source } = video
+                        return (
+
+                            <VideoCard
+                                key={id}
+                                workspaceId={workspaceId}
+                                User={User}
+                                Folder={Folder}
+                                processing={processing}
+                                createdAt={createdAt}
+                                title={title}
+                                source={source}
+                                id={id}
+                            />
+                        )
+                    })
                 ) : (
                     <p className="text-[#BDBDBD]"> No videos in workspace</p>
-                )} */}
-                <VideoCard
-                    key={video.id}
-                    workspaceId={workspaceId}
-                    {...video}
-                />
+                )}
             </section>
         </div>
     )
